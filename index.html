@@ -1,373 +1,111 @@
-<!DOCTYPE html>
-<html lang="hi">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free Auto Captions - 100+ Fonts</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PCap v2 — AI Auto Captions</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-  body { background:#0f0f1a; color:#fff; min-height:100vh; padding:20px; }
-  .container { max-width:800px; margin:0 auto; }
-  header { text-align:center; padding:20px 0; }
-  header h1 { font-size:1.8rem; background:linear-gradient(90deg,#ff6b6b,#feca57); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  header p { color:#aaa; margin-top:8px; font-size:0.9rem; }
-  .card { background:#1a1a2e; border-radius:16px; padding:20px; margin:16px 0; }
-  .card h2 { font-size:1rem; color:#feca57; margin-bottom:12px; }
-  .row { display:flex; gap:10px; flex-wrap:wrap; }
-  button, .file-label { background:#ff6b6b; border:none; color:#fff; padding:12px 20px; border-radius:10px; cursor:pointer; font-size:0.9rem; font-weight:600; transition:0.2s; }
-  button:hover, .file-label:hover { background:#ff5252; transform:translateY(-2px); }
-  button:disabled { background:#444; cursor:not-allowed; transform:none; }
-  .btn-secondary { background:#2d2d44; }
-  .btn-secondary:hover { background:#3d3d5c; }
-  #fileInput { display:none; }
-  select, input[type=color] { background:#2d2d44; color:#fff; border:none; padding:10px; border-radius:8px; font-size:0.9rem; }
-  input[type=range] { accent-color:#ff6b6b; }
-  label { font-size:0.85rem; color:#ccc; display:block; margin:10px 0 4px; }
-  #status { color:#feca57; font-size:0.9rem; margin-top:12px; min-height:20px; }
-  #preview { background:#000; border-radius:12px; padding:24px; min-height:120px; margin-top:12px; display:flex; overflow-y:auto; max-height:300px; }
-  #previewText { width:100%; word-wrap:break-word; line-height:1.4; }
-  #captionText { width:100%; min-height:120px; background:#2d2d44; color:#fff; border:none; border-radius:10px; padding:12px; font-size:1rem; resize:vertical; }
-  .note { color:#888; font-size:0.8rem; margin-top:8px; line-height:1.5; }
-  canvas { display:none; }
+:root{--bg:#070a12;--card:#101624;--card2:#151d2e;--text:#f7f8ff;--muted:#9ca8bd;--accent:#7c5cff;--accent2:#19d3ff;--border:#273149}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#18213a 0,#070a12 48%);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:auto;padding:22px}.hero{text-align:center;padding:28px 12px}.logo{font-size:42px;font-weight:900;letter-spacing:-2px}.logo span{color:var(--accent2)}h1{margin:8px 0;font-size:clamp(28px,5vw,48px)}p{color:var(--muted)}.card{background:rgba(16,22,36,.94);border:1px solid var(--border);border-radius:20px;padding:20px;margin:16px 0;box-shadow:0 15px 45px #0005}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}button,.fileLabel,select,input,textarea{font:inherit}button,.fileLabel{border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(135deg,var(--accent),#4d8dff);color:white;font-weight:800;cursor:pointer}.secondary{background:#202a40}.danger{background:#7d2635}button:disabled{opacity:.5;cursor:not-allowed}input[type=color]{width:54px;height:42px;padding:2px;background:#111;border:1px solid var(--border);border-radius:10px}input[type=range]{width:180px}select,textarea{width:100%;background:#0b111d;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px}label{display:block;color:#c8d0df;font-size:13px;margin-bottom:6px;font-weight:700}.note{font-size:13px}.status{padding:12px;border-radius:12px;background:#0b111d;border:1px solid var(--border);margin-top:12px}.previewWrap{display:grid;grid-template-columns:minmax(250px,420px) 1fr;gap:18px}.preview{position:relative;width:100%;aspect-ratio:9/16;max-height:650px;background:#000;border-radius:18px;overflow:hidden;border:1px solid var(--border)}.preview video{width:100%;height:100%;object-fit:cover}.caption{position:absolute;left:5%;width:90%;text-align:center;white-space:pre-wrap;word-break:break-word;text-shadow:0 3px 12px #000;font-size:30px;font-weight:700;line-height:1.12;pointer-events:none}.caption.top{top:12%}.caption.center{top:50%;transform:translateY(-50%)}.caption.bottom{bottom:12%}.captionBox{padding:12px;border:1px solid var(--border);border-radius:14px;background:#0b111d}.timeline{displa
+y:flex;gap:6px;flex-wrap:wrap;max-height:220px;overflow:auto}.chunk{padding:7px 9px;background:#182238;border:1px solid #2c3956;border-radius:9px;cursor:pointer;font-size:12px}.chunk.active{border-color:var(--accent2);box-shadow:0 0 0 1px var(--accent2)}.small{font-size:12px}.hidden{display:none!important}.progress{height:8px;background:#20293c;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+/* Animation engine */
+@keyframes pop{0%{opacity:0;transform:scale(.65)}70%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}@keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}70%{transform:translateY(3px)}}@keyframes zoom{0%{opacity:0;transform:scale(1.6)}100%{opacity:1;transform:scale(1)}}@keyframes slideUp{0%{opacity:0;transform:translateY(45px)}100%{opacity:1;transform:translateY(0)}}@keyframes slideDown{0%{opacity:0;transform:translateY(-45px)}100%{opacity:1;transform:translateY(0)}}@keyframes slideLeft{0%{opacity:0;transform:translateX(55px)}100%{opacity:1;transform:translateX(0)}}@keyframes slideRight{0%{opacity:0;transform:translateX(-55px)}100%{opacity:1;transform:translateX(0)}}@keyframes fade{0%{opacity:0}100%{opacity:1}}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}@keyframes swing{20%{transform:rotate(10deg)}40%{transform:rotate(-7deg)}60%{transform:rotate(4deg)}80%{transform:rotate(-2deg)}100%{transform:rotate(0)}}@keyframes flip{0%{opacity:0;transform:perspective(400px) rotateX(90deg)}100%{opacity:1;transform:perspective(400px) rotateX(0)}}@keyframes rubber{0%{transform:scale3d(1,1,1)}30%{transform:scale3d(1.25,.75,1)}40%{transform:scale3d(.75,1.25,1)}60%{transform:scale3d(1.1,.9,1)}100%{transform:scale3d(1,1,1)}}@keyframes pulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.06);filter:brightness(1.5)}}@keyframes neon{0%,18%,22%,63%,64%,65%,100%{opacity:1;text-shadow:0 0 5px currentColor,0 0 16px currentColor,0 0 32px currentColor}20%,21%,62%{opacity:.45;text-shadow:none}}@keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.08)}28%{transform:scale(1)}42%{transform:scale(1.08)}70%{transform:scale(1)}}@keyframes wave{0%{transform:skewX(0)}25%{transform:skewX(8deg)}50%{transform:skewX(0)}75%{transform:skewX(-8deg)}100%{transform:skewX(0)}}@keyframes lightSweep{0%{filter:brightness(.8)}50%{filter:brightness(1.8)}100%{filter:brightness(.8)}}
+.a-pop{animation:pop .55s both}.a-bounce{animation:bounce .8s both}.a-zoom{animation:zoom .55s both}.a-slideUp{animation:slideUp .55s both}.a-slideDown{animation:slideDown .55s both}.a-slideLeft{animation:slideLeft .55s both}.a-slideRight{animation:slideRight .55s both}.a-fade{animation:fade .65s both}.a-shake{animation:shake .55s both}.a-swing{animation:swing .8s both}.a-flip{animation:flip .7s both}.a-rubber{animation:rubber .8s both}.a-pulse{animation:pulse 1s infinite}.a-neon{animation:neon 1.5s infinite}.a-heartbeat{animation:heartbeat 1.2s infinite}.a-wave{animation:wave .9s infinite}.a-lightSweep{animation:lightSweep 1.2s infinite}
+@media(max-width:760px){.previewWrap{grid-template-columns:1fr}.preview{max-width:380px;margin:auto}.container{padding:12px}.logo{font-size:34px}}
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
-    <h1>🎬 Free Auto Captions Generator</h1>
-    <p>100+ fonts • Bilkul Free • No signup needed for visitors</p>
-  </header>
+<section class="hero"><div class="logo">P<span>C</span>ap</div><h1>AI Auto Captions — PCap v2</h1><p>Video/audio → AI captions → professional styles → animated preview → video export</p></section>
 
-  <!-- STEP 1: Input -->
-  <div class="card">
-    <h2>Step 1: Video/Audio Upload Karein 🎥</h2>
-    <div class="row">
-      <label class="file-label" for="fileInput">📁 File Choose Karein</label>
-      <input type="file" id="fileInput" accept="audio/*,video/*">
-      <select id="lang">
-        <option value="hi-IN">🇮🇳 Hindi</option>
-        <option value="en-US">🇺🇸 English</option>
-        <option value="en-IN">🇮🇳 English (India)</option>
-        <option value="mr-IN">🇮🇳 Marathi</option>
-        <option value="bn-IN">🇮🇳 Bengali</option>
-        <option value="ta-IN">🇮🇳 Tamil</option>
-        <option value="te-IN">🇮🇳 Telugu</option>
-      </select>
-    </div>
-    <div class="row" style="margin-top:12px;">
-      <button id="micBtn" class="btn-secondary">🎤 Mic Se Live Captions</button>
-      <button id="stopBtn" class="btn-secondary" disabled>⏹ Stop</button>
-    </div>
-    <p id="status"></p>
-    <p class="note">💡 Tip: Pehli baar AI model download hoga (~40MB), uske baad fast chalega. Chrome/Edge browser use karein. Lambe videos (5+ min) me thoda time lagega.</p>
-  </div>
-
-  <!-- STEP 2: Text -->
-  <div class="card" id="textCard" style="display:none;">
-    <h2>Step 2: Captions Edit Karein ✏️</h2>
-    <textarea id="captionText" placeholder="Yahan captions aayenge..."></textarea>
-  </div>
-
-  <!-- STEP 3: Style -->
-  <div class="card" id="styleCard" style="display:none;">
-    <h2>Step 3: Font & Style Choose Karein 🎨</h2>
-    <label>Font (100+ options)</label>
-    <select id="fontSelect" style="width:100%;"></select>
-    <div class="row" style="margin-top:12px; align-items:center;">
-      <div>
-        <label>Size</label>
-        <input type="range" id="sizeRange" min="12" max="60" value="28">
-      </div>
-      <div>
-        <label>Text Color</label>
-        <input type="color" id="colorPick" value="#ffffff">
-      </div>
-      <div>
-        <label>Background</label>
-        <input type="color" id="bgPick" value="#000000">
-      </div>
-      <div>
-        <label>Position</label>
-        <select id="posSelect">
-          <option value="bottom">Bottom</option>
-          <option value="center">Center</option>
-          <option value="top">Top</option>
-        </select>
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button id="boldBtn" class="btn-secondary">🔡 Bold</button>
-      </div>
-    </div>
-    <div id="preview"><div id="previewText"></div></div>
-  </div>
-
-  <!-- STEP 4: Export -->
-  <div class="card" id="exportCard" style="display:none;">
-    <h2>Step 4: Download Karein ⬇️</h2>
-    <div class="row">
-      <button id="srtBtn">📄 SRT File (Video Editors ke liye)</button>
-      <button id="pngBtn" class="btn-secondary">🖼️ PNG Image</button>
-      <button id="copyBtn" class="btn-secondary">📋 Copy Text</button>
-    </div>
-    <p class="note">SRT file ko aap CapCut, Premiere, Kinemaster me import kar sakte hain.</p>
-  </div>
-
-  <p class="note" style="text-align:center;">⚡ 100% Free &amp; Private — aapki files kisi server par upload nahi hoti, sab kuch aapke browser me hota hai.</p>
+<div class="card">
+<h2>1. Video / Audio Upload</h2>
+<div class="grid">
+<div><label>Media file</label><input id="fileInput" type="file" accept="video/*,audio/*"></div>
+<div><label>Language</label><select id="lang"><option value="hi">Hindi</option><option value="en">English</option><option value="mr">Marathi</option><option value="bn">Bengali</option><option value="ta">Tamil</option><option value="te">Telugu</option></select></div>
+</div>
+<div class="row" style="margin-top:12px"><button id="transcribeBtn">🤖 Generate AI Captions</button><button id="micBtn" class="secondary">🎙️ Live Mic</button></div>
+<div id="status" class="status">Ready.</div><div class="progress"><div id="bar" class="bar"></div></div>
 </div>
 
-<canvas id="pngCanvas"></canvas>
+<div class="card hidden" id="editorCard">
+<h2>2. Caption Editor</h2>
+<div class="previewWrap">
+<div><div class="preview" id="preview"><video id="previewVideo" playsinline></video><div id="caption" class="caption bottom a-pop">Your caption</div></div><div class="row" style="margin-top:10px"><button id="playBtn">▶ Preview</button><button id="stopBtn" class="secondary">⏹ Stop</button></div></div>
+<div>
+<div class="captionBox"><label>Caption text</label><textarea id="captionText" rows="7"></textarea></div>
+<div class="grid" style="margin-top:12px">
+<div><label>Font (100+)</label><select id="fontSelect"></select></div>
+<div><label>Animation (120+ presets)</label><select id="animSelect"></select></div>
+<div><label>Text color</label><input id="colorPick" type="color" value="#ffffff"></div>
+<div><label>Glow color</label><input id="glowPick" type="color" value="#7c5cff"></div>
+<div><label>Background</label><input id="bgPick" type="color" value="#000000"></div>
+<div><label>Size</label><input id="sizeRange" type="range" min="18" max="80" value="34"></div>
+<div><label>Glow strength</label><input id="glowRange" type="range" min="0" max="40" value="14"></div>
+<div><label>Position</label><select id="posSelect"><option value="top">Top</option><option value="center">Center</option><option value="bottom" selected>Bottom</option></select></div>
+</div>
+<div class="row" style="margin-top:12px"><button id="boldBtn" class="secondary">🔡 Bold</button><button id="bgToggle" class="secondary">⬛ Background On/Off</button></div>
+</div></div>
+<div style="margin-top:16px"><label>Caption segments — tap one to edit</label><div id="timeline" class="timeline"></div></div>
+</div>
 
+<div class="card hidden" id="exportCard">
+<h2>3. Export</h2>
+<div class="row"><button id="videoExportBtn">🎬 Export Captioned Video</button><button id="srtBtn" class="secondary">📄 SRT</button><button id="pngBtn" class="secondary">🖼️ PNG</button><button id="copyBtn" class="secondary">📋 Copy Text</button></div>
+<p class="note">Video export browser mein real-time render hota hai. Output usually WebM hota hai; Chrome/Edge mein support best rahega.</p>
+</div>
+
+<div class="card"><h3>PCap v2</h3><p class="note">AI transcription browser-side Whisper model se hoti hai. Pehli baar model download hone mein time aur storage lag sakta hai.</p></div>
+</div>
+
+<canvas id="renderCanvas" class="hidden"></canvas><canvas id="pngCanvas" class="hidden"></canvas>
 <script type="module">
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
-env.allowLocalModels = false;
+env.allowLocalModels=false; env.useBrowserCache=true;
 
-// ============ 100+ FREE GOOGLE FONTS ============
-const FONTS = [
-'Roboto','Open Sans','Lato','Montserrat','Poppins','Oswald','Raleway','Ubuntu','Merriweather',
-'Playfair Display','Nunito','PT Sans','Roboto Condensed','Roboto Mono','Noto Sans','Noto Serif',
-'Inter','Rubik','Work Sans','Fira Sans','Fira Code','Mukta','Hind','Heebo','Barlow',
-'Barlow Condensed','Cabin','Catamaran','Comfortaa','Dosis','Exo 2','Hind Siliguri','Inconsolata',
-'Indie Flower','Josefin Sans','Kanit','Karla','Libre Baskerville','Lobster','Manrope','Maven Pro',
-'Mulish','Nanum Gothic','Orbitron','Overpass','Pacifico','Quicksand','Rajdhani','Righteous',
-'Saira Condensed','Space Grotesk','Space Mono','Spectral','Titillium Web','Varela Round',
-'Yanone Kaffeesatz','Zilla Slab','Abril Fatface','Alfa Slab One','Archivo','Archivo Black',
-'Arimo','Asap','Bebas Neue','Bitter','Cormorant Garamond','Domine','EB Garamond','Gudea',
-'Hammersmith One','IBM Plex Sans','IBM Plex Serif','Jost','Khand','Lora','Merienda','Neuton',
-'Old Standard TT','Cinzel','Alegreya','Alegreya Sans','BioRhyme','Bree Serif','Copse','Vollkorn',
-'Dancing Script','Great Vibes','Satisfy','Sacramento','Courgette','Kaushan Script','Yellowtail',
-'Permanent Marker','Rock Salt','Shadows Into Light','Patrick Hand','Amatic SC','Cardo',
-'Passion One','Tektur','Chakra Petch','Bungee','Shrikhand','Bricolage Grotesque'
-];
+const $=id=>document.getElementById(id); const status=$('status'); const bar=$('bar');
+let file=null, mediaUrl='', chunks=[], transcriber=null, bold=true, bgOn=false, mediaKind='';
+let fonts=['Roboto','Open Sans','Lato','Montserrat','Poppins','Oswald','Raleway','Ubuntu','Merriweather','Playfair Display','Nunito','PT Sans','Roboto Condensed','Roboto Mono','Noto Sans','Noto Serif','Inter','Rubik','Work Sans','Fira Sans','Fira Code','Mukta','Hind','Heebo','Barlow','Barlow Condensed','Cabin','Catamaran','Comfortaa','Dosis','Exo 2','Hind Siliguri','Inconsolata','Indie Flower','Josefin Sans','Kanit','Karla','Libre Baskerville','Lobster','Manrope','Maven Pro','Mulish','Nanum Gothic','Orbitron','Overpass','Pacifico','Quicksand','Rajdhani','Righteous','Saira Condensed','Space Grotesk','Space Mono','Spectral','Titillium Web','Varela Round','Yanone Kaffeesatz','Zilla Slab','Abril Fatface','Alfa Slab One','Archivo','Archivo Black','Arimo','Asap','Bebas Neue','Bitter','Cormorant Garamond','Domine','EB Garamond','Gudea','Hammersmith One','IBM Plex Sans','IBM Plex Serif','Jost','Khand','Lora','Merienda','Neuton','Old Standard TT','Cinzel','Alegreya','Alegreya Sans','BioRhyme','Bree Serif','Copse','Vollkorn','Dancing Script','Great Vibes','Satisfy','Sacramento','Courgette','Kaushan Script','Yellowtail','Permanent Marker','Rock Salt','Shadows Into Light','Patrick Hand','Amatic SC','Cardo','Passion One','Tektur','Chakra Petch','Bungee','Shrikhand','Bricolage Grotesque','DM Sans','Plus Jakarta Sans','Outfit','Urbanist','Sora','Lexend','Archivo Narrow','Anton','League Spartan','Fjalla One','Josefin Slab','Rokkitt','Alumni Sans','Be Vietnam Pro'];
+const effects=['pop','bounce','zoom','slideUp','slideDown','slideLeft','slideRight','fade','shake','swing','flip','rubber','pulse','neon','heartbeat','wave','lightSweep'];
+const presets=[]; for(let i=0;i<120;i++) presets.push({name:`Animation ${i+1} — ${effects[i%effects.length]} ${Math.floor(i/effects.length)+1}`,effect:effects[i%effects.length],glow:i%3!==0});
 
-// Google Fonts ko load karo
-const link = document.createElement('link');
-link.rel = 'stylesheet';
-link.href = 'https://fonts.googleapis.com/css2?family=' +
-  FONTS.map(f => f.replace(/ /g,'+') + ':wght@400;700').join('&family=') +
-  '&display=swap';
-document.head.appendChild(link);
+const fontLink=document.createElement('link'); fontLink.rel='stylesheet'; fontLink.href='https://fonts.googleapis.com/css2?'+fonts.map(f=>'family='+encodeURIComponent(f).replace(/%20/g,'+')+':wght@400;700;800').join('&')+'&display=swap'; document.head.appendChild(fontLink);
+fonts.forEach(f=>{let o=document.createElement('option');o.value=f;o.textContent=f;$('fontSelect').appendChild(o)});
+presets.forEach((p,i)=>{let o=document.createElement('option');o.value=i;o.textContent=p.name;$('animSelect').appendChild(o)});
 
-// Font dropdown bharo
-const fontSelect = document.getElementById('fontSelect');
-FONTS.forEach(f => {
-  const o = document.createElement('option');
-  o.value = f; o.textContent = f; o.style.fontFamily = f;
-  fontSelect.appendChild(o);
-});
+function setStatus(t,p=null){status.textContent=t;if(p!=null)bar.style.width=Math.max(0,Math.min(100,p))+'%'}
+function downsample(buffer,target=16000){if(buffer.sampleRate===target)return Promise.resolve(buffer.getChannelData(0));const len=Math.floor(buffer.duration*target),ctx=new OfflineAudioContext(1,len,target),src=ctx.createBufferSource();src.buffer=buffer;src.connect(ctx.destination);src.start();return ctx.startRendering().then(r=>r.getChannelData(0))}
 
-// ============ STATE ============
-let chunks = [];        // {start, end, text}
-let transcriber = null;
-let micRec = null, micStart = 0;
-let bold = false;
-const $ = id => document.getElementById(id);
-const statusEl = $('status');
+async function recordMediaStream(stream, maxMs){return new Promise((resolve,reject)=>{const chunksOut=[];let rec;try{const mime=['audio/webm;codecs=opus','video/webm;codecs=vp8,opus','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));rec=new MediaRecorder(stream,mime?{mimeType:mime}:undefined)}catch(e){reject(e);return}rec.ondataavailable=e=>e.data.size&&chunksOut.push(e.data);rec.onerror=e=>reject(e.error||new Error('MediaRecorder error'));rec.onstop=()=>resolve(new Blob(chunksOut,{type:rec.mimeType||'audio/webm'}));rec.start(1000);setTimeout(()=>{if(rec.state!=='inactive')rec.stop()},Math.max(1000,maxMs));})}
+async function extractAudio(f){if(f.type.startsWith('audio/')){const buf=await (await fetch(URL.createObjectURL(f))).arrayBuffer();const ac=new AudioContext();const decoded=await ac.decodeAudioData(buf);await ac.close();return downsample(decoded)}
+const url=URL.createObjectURL(f),v=document.createElement('video');v.src=url;v.preload='auto';v.playsInline=true;await new Promise((res,rej)=>{v.onloadedmetadata=res;v.onerror=()=>rej(new Error('Video load nahi hua. MP4/WebM try karein.'))});if(!v.captureStream&&!v.mozCaptureStream){URL.revokeObjectURL(url);throw new Error('Is browser me video audio capture supported nahi hai. Latest Chrome/Edge try karein.')};const stream=(v.captureStream||v.mozCaptureStream).call(v);const audioTracks=stream.getAudioTracks();if(!audioTracks.length){URL.revokeObjectURL(url);throw new Error('Video me audio track nahi mila.')};setStatus('🎧 Video audio read ho raha hai…',0);const recorded=await recordMediaStream(new MediaStream(audioTracks),Math.min(v.duration*1000+1500,30*60*1000));URL.revokeObjectURL(url);const ac=new AudioContext();const decoded=await ac.decodeAudioData(await recorded.arrayBuffer());await ac.close();return downsample(decoded)}
 
-// ============ AUDIO PROCESSING ============
-async function downsample(buffer, targetRate = 16000) {
-  if (buffer.sampleRate === targetRate) return buffer.getChannelData(0);
-  const length = Math.floor(buffer.duration * targetRate);
-  const ctx = new OfflineAudioContext(1, length, targetRate);
-  const src = ctx.createBufferSource();
-  src.buffer = buffer; src.connect(ctx.destination); src.start();
-  const rendered = await ctx.startRendering();
-  return rendered.getChannelData(0);
-}
+$('transcribeBtn').onclick=async()=>{file=$('fileInput').files[0];if(!file){setStatus('❌ Pehle video/audio select karein.');return}$('transcribeBtn').disabled=true;try{if(!transcriber){setStatus('⬇️ Whisper AI model download ho raha hai…');transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{progress_callback:p=>{if(p.status==='progress'&&p.progress!=null)setStatus(`⬇️ AI model: ${Math.round(p.progress)}%`,p.progress)}})}setStatus('🎧 Audio prepare ho raha hai…');const audio=await extractAudio(file);setStatus('🤖 Captions generate ho rahe hain…');const lang=$('lang').value;const result=await transcriber(audio,{language:lang,task:'transcribe',return_timestamps:true,chunk_length_s:30,stride_length_s:5});chunks=(result.chunks||[]).map(c=>({start:c.timestamp?.[0]??0,end:c.timestamp?.[1]??((c.timestamp?.[0]??0)+2),text:c.text.trim()})).filter(c=>c.text);if(!chunks.length&&result.text)chunks=[{start:0,end:5,text:result.text.trim()}];if(!chunks.length)throw new Error('Caption text nahi mila.');setupEditor();setStatus('✅ Captions ready! Animation aur style choose karein.',100)}catch(e){console.error(e);setStatus('❌ '+(e.message||e))}finally{$('transcribeBtn').disabled=false}}
 
-async function extractAudio(file) {
-  const url = URL.createObjectURL(file);
-  try {
-    if (file.type.startsWith('audio/')) {
-      const buf = await (await fetch(url)).arrayBuffer();
-      const ac = new AudioContext();
-      const decoded = await ac.decodeAudioData(buf);
-      ac.close();
-      return await downsample(decoded);
-    }
-    // Video se audio nikaalo
-    const video = document.createElement('video');
-    video.src = url; video.preload = 'auto';
-    await new Promise((res, rej) => {
-      video.onloadedmetadata = res;
-      video.onerror = () => rej(new Error('Video load nahi hua. MP4/WebM try karein.'));
-    });
-    const sr = 16000;
-    const length = Math.min(Math.ceil(video.duration * sr), 30 * 60 * sr);
-    const ctx = new OfflineAudioContext(1, length, sr);
-    const src = ctx.createMediaElementSource(video);
-    src.connect(ctx.destination);
-    statusEl.textContent = 'Video se audio nikal rahe hain...';
-    const rendered = await ctx.startRendering();
-    return rendered.getChannelData(0);
-  } finally { URL.revokeObjectURL(url); }
-}
+function setupEditor(){mediaUrl=URL.createObjectURL(file);mediaKind=file.type.startsWith('video/')?'video':'audio';$('editorCard').classList.remove('hidden');$('exportCard').classList.remove('hidden');if(mediaKind==='video'){$('previewVideo').src=mediaUrl}else{$('previewVideo').removeAttribute('src');$('previewVideo').style.background='#111'}renderTimeline();selectChunk(0)}
+function renderTimeline(){const t=$('timeline');t.innerHTML='';chunks.forEach((c,i)=>{const b=document.createElement('button');b.className='chunk';b.textContent=`${fmt(c.start)} • ${c.text.slice(0,45)}`;b.onclick=()=>selectChunk(i);t.appendChild(b)})}
+function fmt(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return `${m}:${String(sec).padStart(2,'0')}`}
+function selectChunk(i){if(!chunks[i])return;chunks.forEach((_,j)=>toggler(j,j===i));$('captionText').value=chunks[i].text;currentIndex=i;applyStyle();if($('previewVideo').src)$('previewVideo').currentTime=chunks[i].start}
+let currentIndex=0;function toggler(i,on){const x=$('timeline').children[i];if(x)x.classList.toggle('active',on)}
+$('captionText').oninput=()=>{if(chunks[currentIndex]){chunks[currentIndex].text=$('captionText').value;renderTimeline();selectChunk(currentIndex)}}
+function applyStyle(){const c=$('caption');const p=presets[+$('animSelect').value||0];c.className='caption '+$('posSelect').value+' a-'+p.effect;c.textContent=$('captionText').value||'Your caption';c.style.fontFamily=`"${$('fontSelect').value}",sans-serif`;c.style.fontSize=$('sizeRange').value+'px';c.style.fontWeight=bold?'800':'400';c.style.color=$('colorPick').value;c.style.textShadow=`0 0 ${$('glowRange').value}px ${$('glowPick').value},0 3px 12px #000`;c.style.background=bgOn?$('bgPick').value+'cc':'transparent';c.style.padding=bgOn?'7px 12px':'0';c.style.borderRadius=bgOn?'10px':'0'}
+['fontSelect','animSelect','colorPick','glowPick','bgPick','sizeRange','glowRange','posSelect'].forEach(id=>$(id).oninput=applyStyle);$('boldBtn').onclick=()=>{bold=!bold;applyStyle()};$('bgToggle').onclick=()=>{bgOn=!bgOn;applyStyle()};
+$('playBtn').onclick=()=>{const v=$('previewVideo');if(!v.src){setStatus('Audio file ke liye video preview available nahi hai.');return}v.play().catch(()=>{})};$('stopBtn').onclick=()=>{$('previewVideo').pause()};
+$('previewVideo').ontimeupdate=()=>{const t=$('previewVideo').currentTime;let idx=chunks.findIndex(c=>t>=c.start&&t<=c.end);if(idx<0)return;if(idx!==currentIndex){currentIndex=idx;renderTimeline();$('captionText').value=chunks[idx].text;applyStyle()} };
 
-// ============ FILE TRANSCRIPTION (Whisper AI - FREE) ============
-$('fileInput').addEventListener('change', async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  $('fileInput').disabled = true;
-  try {
-    if (!transcriber) {
-      statusEl.textContent = '⬇️ AI model download ho raha hai (sirf pehli baar, ~40MB)...';
-      transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
-        progress_callback: p => {
-          if (p.status === 'progress' && p.progress != null)
-            statusEl.textContent = `⬇️ Model download: ${Math.round(p.progress)}%`;
-        }
-      });
-    }
-    const audio = await extractAudio(file);
-    statusEl.textContent = '🤖 AI captions bana raha hai... (lambe video me time lagega)';
-    const result = await transcriber(audio, { return_timestamps: true, chunk_length_s: 30, stride_length_s: 5 });
-    chunks = (result.chunks || []).map(c => ({
-      start: c.timestamp?.[0] ?? 0,
-      end: c.timestamp?.[1] ?? (c.timestamp?.[0] ?? 0) + 2,
-      text: c.text.trim()
-    })).filter(c => c.text);
-    if (!chunks.length && result.text) chunks = [{ start: 0, end: 5, text: result.text.trim() }];
-    showResults();
-    statusEl.textContent = '✅ Ho gaya! Ab font choose karein 👇';
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = '❌ Error: ' + err.message;
-  } finally { $('fileInput').disabled = false; }
-});
+function srtTime(s){const ms=Math.floor((s%1)*1000),total=Math.floor(s),sec=total%60,min=Math.floor(total/60)%60,hr=Math.floor(total/3600);return `${String(hr).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')},${String(ms).padStart(3,'0')}`}
+$('srtBtn').onclick=()=>{const text=chunks.map((c,i)=>`${i+1}\n${srtTime(c.start)} --> ${srtTime(c.end)}\n${c.text}\n`).join('\n');download(new Blob([text],{type:'text/plain'}),'pcap-captions.srt')};$('copyBtn').onclick=async()=>{await navigator.clipboard.writeText(chunks.map(c=>c.text).join(' '));setStatus('✅ Caption text copied!')};
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$('pngBtn').onclick=async()=>{const can=$('pngCanvas'),ctx=can.getContext('2d');can.width=1080;can.height=1920;ctx.fillStyle=$('bgPick').value;ctx.fillRect(0,0,can.width,can.height);await document.fonts.load(`800 ${+$('sizeRange').value*2}px "${$('fontSelect').value}"`);ctx.font=`${bold?'800':'400'} ${+$('sizeRange').value*2}px "${$('fontSelect').value}"`;ctx.fillStyle=$('colorPick').value;ctx.textAlign='center';ctx.shadowColor=$('glowPick').value;ctx.shadowBlur=+$('glowRange').value*2;const lines=wrap(ctx,$('captionText').value,900);let y=$('posSelect').value==='top'?180:$('posSelect').value==='center'?960:1740;lines.forEach(l=>{ctx.fillText(l,540,y);y+=+$('sizeRange').value*2*1.3});can.toBlob(b=>download(b,'pcap-caption.png'),'image/png')};
+function wrap(ctx,text,max){let out=[],line='';for(const w of text.split(/\s+/)){const x=line?line+' '+w:w;if(ctx.measureText(x).width>max&&line){out.push(line);line=w}else line=x}if(line)out.push(line);return out}
 
-// ============ MIC CAPTIONS (Web Speech API - FREE) ============
-$('micBtn').addEventListener('click', () => {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { statusEl.textContent = '❌ Aapka browser mic captions support nahi karta. Chrome use karein.'; return; }
-  micRec = new SR();
-  micRec.lang = $('lang').value;
-  micRec.continuous = true; micRec.interimResults = false;
-  chunks = [];
-  micStart = performance.now();
-  micRec.onresult = e => {
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        const now = (performance.now() - micStart) / 1000;
-        const prev = chunks[chunks.length - 1];
-        if (prev) prev.end = now;
-        chunks.push({ start: now, end: now + 2, text: e.results[i][0].transcript.trim() });
-        showResults(false);
-      }
-    }
-  };
-  micRec.onerror = e => { statusEl.textContent = '❌ Mic error: ' + e.error; stopMic(); };
-  micRec.onend = () => { if (micRec) micRec.start(); };  // restart to keep alive
-  micRec.start();
-  $('micBtn').disabled = true; $('stopBtn').disabled = false;
-  statusEl.textContent = '🎤 Sun rahe hain... boliye ya video chalayein (live captions dikhenge)';
-});
+async function exportVideo(){if(mediaKind!=='video'){setStatus('❌ Video export ke liye video file upload karein.');return}const v=$('previewVideo');if(!v.captureStream&&!v.mozCaptureStream){setStatus('❌ Browser video capture support nahi karta. Latest Chrome/Edge use karein.');return}const canvas=$('renderCanvas'),ctx=canvas.getContext('2d');const W=1080,H=1920;canvas.width=W;canvas.height=H;const vw=v.videoWidth||1080,vh=v.videoHeight||1920;const ratio=Math.min(W/vw,H/vh);const dw=vw*ratio,dh=vh*ratio,dx=(W-dw)/2,dy=(H-dh)/2;const canvasStream=canvas.captureStream(30);const ac=new AudioContext();const src=ac.createMediaElementSource(v);const dest=ac.createMediaStreamDestination();src.connect(dest);const out=new MediaStream([...canvasStream.getVideoTracks(),...dest.stream.getAudioTracks()]);const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));if(!mime){setStatus('❌ Is browser me WebM recording supported nahi hai. Chrome/Edge try karein.');return}const rec=new MediaRecorder(out,{mimeType:mime,videoBitsPerSecond:6000000});const parts=[];rec.ondataavailable=e=>e.data.size&&parts.push(e.data);rec.onerror=e=>setStatus('❌ Export error: '+(e.error?.message||e));const done=new Promise(resolve=>rec.onstop=()=>resolve());v.currentTime=0;v.muted=false;await ac.resume();rec.start(500);setStatus('🎬 Video render/export ho raha hai… 0%');let last=-1;const draw=()=>{if(v.paused&&v.currentTime<v.duration){v.play().catch(()=>{})}ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.drawImage(v,dx,dy,dw,dh);const t=v.currentTime;const c=chunks.find(x=>t>=x.start&&t<=x.end);if(c){const s=getComputedStyle($('caption'));ctx.save();ctx.textAlign='center';ctx.fillStyle=$('colorPick').value;ctx.font=`${bold?'800':'400'} ${+$('sizeRange').value*2}px "${$('fontSelect').value}"`;ctx.shadowColor=$('glowPick').value;ctx.shadowBlur=+$('glowRange').value*2;let y=$('posSelect').value==='top'?260:$('posSelect').value==='center'?960:1690;const lines=wrap(ctx,c.text,900);if(bgOn){co
+nst max=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);ctx.fillStyle=$('bgPick').value+'cc';ctx.fillRect(W/2-max/2-25,y-$('sizeRange').value*2,max+50,lines.length*($('sizeRange').value*2*1.3)+30);ctx.fillStyle=$('colorPick').value}lines.forEach(l=>{ctx.fillText(l,W/2,y);y+=+$('sizeRange').value*2*1.3});ctx.restore()}const pct=Math.round((t/v.duration)*100);if(pct!==last){last=pct;setStatus(`
+🎬 Export ho raha hai… ${pct}%`,pct)}if(t<v.duration-0.03)requestAnimationFrame(draw);else{v.pause();setTimeout(()=>rec.stop(),300)}};v.onended=()=>{};v.play().catch(()=>{});draw();await done;const blob=new Blob(parts,{type:mime});download(blob,'pcap-captioned-video.webm');canvasStream.getTracks().forEach(t=>t.stop());out.getTracks().forEach(t=>t.stop());src.disconnect();await ac.close();setStatus('✅ Captioned video export ho gaya! 100%',100)}
+$('videoExportBtn').onclick=exportVideo;
 
-function stopMic() {
-  if (micRec) { const r = micRec; micRec = null; r.onend = null; r.stop(); }
-  $('micBtn').disabled = false; $('stopBtn').disabled = true;
-  statusEl.textContent = '✅ Mic captions taiyaar!';
-}
-$('stopBtn').addEventListener('click', stopMic);
-
-// ============ RESULTS & STYLING ============
-function showResults(scroll = true) {
-  const fullText = chunks.map(c => c.text).join(' ');
-  $('captionText').value = fullText;
-  $('textCard').style.display = 'block';
-  $('styleCard').style.display = 'block';
-  $('exportCard').style.display = 'block';
-  updatePreview();
-  if (scroll) $('textCard').scrollIntoView({ behavior: 'smooth' });
-}
-
-function currentState() {
-  return {
-    font: fontSelect.value,
-    size: parseInt($('sizeRange').value),
-    color: $('colorPick').value,
-    bg: $('bgPick').value,
-    pos: $('posSelect').value,
-    bold: bold
-  };
-}
-
-function updatePreview() {
-  const s = currentState();
-  const text = $('captionText').value || 'Yahan aapke captions dikhenge...';
-  $('previewText').textContent = text;
-  const pv = $('preview');
-  pv.style.background = s.bg;
-  pv.style.justifyContent = s.pos === 'top' ? 'flex-start' : s.pos === 'center' ? 'center' : 'flex-end';
-  pv.style.alignItems = 'flex-start';
-  const pt = $('previewText');
-  pt.style.fontFamily = `"${s.font}", sans-serif`;
-  pt.style.fontSize = s.size + 'px';
-  pt.style.color = s.color;
-  pt.style.fontWeight = s.bold ? '700' : '400';
-  $('captionText').style.fontFamily = `"${s.font}", sans-serif`;
-  $('captionText').style.fontSize = Math.min(s.size, 20) + 'px';
-}
-
-$('captionText').addEventListener('input', updatePreview);
-fontSelect.addEventListener('change', updatePreview);
-$('sizeRange').addEventListener('input', updatePreview);
-$('colorPick').addEventListener('input', updatePreview);
-$('bgPick').addEventListener('input', updatePreview);
-$('posSelect').addEventListener('input', updatePreview);
-$('boldBtn').addEventListener('click', () => { bold = !bold; $('boldBtn').style.background = bold ? '#ff6b6b' : '#2d2d44'; updatePreview; updatePreview(); });
-
-// ============ EXPORT: SRT ============
-function srtTime(s) {
-  const p = n => String(n).padStart(2, '0');
-  return `${p(Math.floor(s/3600))}:${p(Math.floor(s/60)%60)}:${p(Math.floor(s)%60)},${String(Math.round((s%1)*1000)).padStart(3,'0')}`;
-}
-$('srtBtn').addEventListener('click', () => {
-  let data = chunks;
-  if (!data.length && $('captionText').value.trim()) data = [{ start: 0, end: 5, text: $('captionText').value.trim() }];
-  if (!data.length) { statusEl.textContent = '❌ Pehle captions banayein!'; return; }
-  const srt = data.map((c,i) => `${i+1}\n${srtTime(c.start)} --> ${srtTime(c.end)}\n${c.text}`).join('\n\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([srt], { type: 'text/plain' }));
-  a.download = 'captions.srt'; a.click();
-});
-
-// ============ EXPORT: COPY ============
-$('copyBtn').addEventListener('click', async () => {
-  if (!$('captionText').value.trim()) { statusEl.textContent = '❌ Pehle captions banayein!'; return; }
-  await navigator.clipboard.writeText($('captionText').value);
-  statusEl.textContent = '✅ Text copy ho gaya!';
-});
-
-// ============ EXPORT: PNG IMAGE ============
-function wrapText(ctx, text, maxW) {
-  const words = text.split(' '); const lines = []; let line = '';
-  for (const w of words) {
-    const test = line ? line + ' ' + w : w;
-    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
-    else line = test;
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-$('pngBtn').addEventListener('click', async () => {
-  const text = $('captionText').value.trim();
-  if (!text) { statusEl.textContent = '❌ Pehle captions banayein!'; return; }
-  const s = currentState();
-  const canvas = $('pngCanvas'), ctx = canvas.getContext('2d');
-  const W = 1080, H = 1350;
-  canvas.width = W; canvas.height = H;
-  ctx.fillStyle = s.bg; ctx.fillRect(0, 0, W, H);
-  const fontSpec = `${s.bold?'700':'400'} ${s.size*3}px "${s.font}"`;
-  try { await document.fonts.load(fontSpec); } catch(e) {}
-  ctx.font = fontSpec; ctx.fillStyle = s.color; ctx.textAlign = 'center';
-  const lines = wrapText(ctx, text, W - 120);
-  const lh = s.size * 3 * 1.35;
-  let y = s.pos === 'top' ? 100 + lh : s.pos === 'center' ? H/2 - ((lines.length-1)*lh)/2 : H - 100 - (lines.length-1)*lh;
-  lines.forEach(l => { ctx.fillText(l, W/2, y); y += lh; });
-  const a = document.createElement('a');
-  a.download = 'captions.png'; a.href = canvas.toDataURL('image/png'); a.click();
-  statusEl.textContent = '✅ PNG download ho gaya!';
-});
+$('micBtn').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){setStatus('❌ Browser mic captions support nahi karta. Chrome try karein.');return}const r=new SR();r.lang=$('lang').value;r.continuous=true;r.interimResults=true;r.onresult=e=>{let final='';for(let i=e.resultIndex;i<e.results.length;i++)final+=e.results[i][0].transcript+' ';if(final){if(!chunks.length)chunks=[{start:0,end:10,text:final.trim()}];else chunks[chunks.length-1].text=final.trim();setupEditor()}};r.onerror=e=>setStatus('❌ Mic: '+e.error);r.start();setStatus('🎙️ Live mic captions running…')};
 </script>
 </body>
 </html>
