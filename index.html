@@ -61,8 +61,17 @@ y:flex;gap:6px;flex-wrap:wrap;max-height:220px;overflow:auto}.chunk{padding:7px 
 
 <canvas id="renderCanvas" class="hidden"></canvas><canvas id="pngCanvas" class="hidden"></canvas>
 <script type="module">
-import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
-env.allowLocalModels=false; env.useBrowserCache=true;
+let pipeline = null;
+let transformersLoaded = false;
+async function loadWhisperLibrary(){
+  if (transformersLoaded) return;
+  setStatus('⬇️ AI library load ho rahi hai…');
+  const mod = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+  pipeline = mod.pipeline;
+  mod.env.allowLocalModels = false;
+  mod.env.useBrowserCache = true;
+  transformersLoaded = true;
+}
 
 const $=id=>document.getElementById(id); const status=$('status'); const bar=$('bar');
 let file=null, mediaUrl='', chunks=[], transcriber=null, bold=true, bgOn=false, mediaKind='';
@@ -81,7 +90,31 @@ async function recordMediaStream(stream, maxMs){return new Promise((resolve,reje
 async function extractAudio(f){if(f.type.startsWith('audio/')){const buf=await (await fetch(URL.createObjectURL(f))).arrayBuffer();const ac=new AudioContext();const decoded=await ac.decodeAudioData(buf);await ac.close();return downsample(decoded)}
 const url=URL.createObjectURL(f),v=document.createElement('video');v.src=url;v.preload='auto';v.playsInline=true;await new Promise((res,rej)=>{v.onloadedmetadata=res;v.onerror=()=>rej(new Error('Video load nahi hua. MP4/WebM try karein.'))});if(!v.captureStream&&!v.mozCaptureStream){URL.revokeObjectURL(url);throw new Error('Is browser me video audio capture supported nahi hai. Latest Chrome/Edge try karein.')};const stream=(v.captureStream||v.mozCaptureStream).call(v);const audioTracks=stream.getAudioTracks();if(!audioTracks.length){URL.revokeObjectURL(url);throw new Error('Video me audio track nahi mila.')};setStatus('🎧 Video audio read ho raha hai…',0);const recorded=await recordMediaStream(new MediaStream(audioTracks),Math.min(v.duration*1000+1500,30*60*1000));URL.revokeObjectURL(url);const ac=new AudioContext();const decoded=await ac.decodeAudioData(await recorded.arrayBuffer());await ac.close();return downsample(decoded)}
 
-$('transcribeBtn').onclick=async()=>{file=$('fileInput').files[0];if(!file){setStatus('❌ Pehle video/audio select karein.');return}$('transcribeBtn').disabled=true;try{if(!transcriber){setStatus('⬇️ Whisper AI model download ho raha hai…');transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{progress_callback:p=>{if(p.status==='progress'&&p.progress!=null)setStatus(`⬇️ AI model: ${Math.round(p.progress)}%`,p.progress)}})}setStatus('🎧 Audio prepare ho raha hai…');const audio=await extractAudio(file);setStatus('🤖 Captions generate ho rahe hain…');const lang=$('lang').value;const result=await transcriber(audio,{language:lang,task:'transcribe',return_timestamps:true,chunk_length_s:30,stride_length_s:5});chunks=(result.chunks||[]).map(c=>({start:c.timestamp?.[0]??0,end:c.timestamp?.[1]??((c.timestamp?.[0]??0)+2),text:c.text.trim()})).filter(c=>c.text);if(!chunks.length&&result.text)chunks=[{start:0,end:5,text:result.text.trim()}];if(!chunks.length)throw new Error('Caption text nahi mila.');setupEditor();setStatus('✅ Captions ready! Animation aur style choose karein.',100)}catch(e){console.error(e);setStatus('❌ '+(e.message||e))}finally{$('transcribeBtn').disabled=false}}
+$('transcribeBtn').onclick=async()=>{
+  file=$('fileInput').files[0];
+  if(!file){setStatus('❌ Pehle video/audio select karein.');return}
+  $('transcribeBtn').disabled=true;
+  try{
+    await loadWhisperLibrary();
+    if(!transcriber){
+      setStatus('⬇️ Whisper AI model download ho raha hai…');
+      transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{progress_callback:p=>{if(p.status==='progress'&&p.progress!=null)setStatus(`⬇️ AI model: ${Math.round(p.progress)}%`,p.progress)}});
+    }
+    setStatus('🎧 Audio prepare ho raha hai…');
+    const audio=await extractAudio(file);
+    setStatus('🤖 Captions generate ho rahe hain…');
+    const langMap={'hi-IN':'hi','en-US':'en','en-IN':'en','mr-IN':'mr','bn-IN':'bn','ta-IN':'ta','te-IN':'te'};
+    const lang=langMap[$('lang').value]||undefined;
+    const opts={task:'transcribe',return_timestamps:true,chunk_length_s:30,stride_length_s:5};
+    if(lang) opts.language=lang;
+    const result=await transcriber(audio,opts);
+    chunks=(result.chunks||[]).map(c=>({start:c.timestamp?.[0]??0,end:c.timestamp?.[1]??((c.timestamp?.[0]??0)+2),text:c.text.trim()})).filter(c=>c.text);
+    if(!chunks.length&&result.text)chunks=[{start:0,end:5,text:result.text.trim()}];
+    if(!chunks.length)throw new Error('Caption text nahi mila.');
+    setupEditor();setStatus('✅ Captions ready! Animation aur style choose karein.',100);
+  }catch(e){console.error(e);setStatus('❌ '+(e?.message||e));}
+  finally{$('transcribeBtn').disabled=false}
+}
 
 function setupEditor(){mediaUrl=URL.createObjectURL(file);mediaKind=file.type.startsWith('video/')?'video':'audio';$('editorCard').classList.remove('hidden');$('exportCard').classList.remove('hidden');if(mediaKind==='video'){$('previewVideo').src=mediaUrl}else{$('previewVideo').removeAttribute('src');$('previewVideo').style.background='#111'}renderTimeline();selectChunk(0)}
 function renderTimeline(){const t=$('timeline');t.innerHTML='';chunks.forEach((c,i)=>{const b=document.createElement('button');b.className='chunk';b.textContent=`${fmt(c.start)} • ${c.text.slice(0,45)}`;b.onclick=()=>selectChunk(i);t.appendChild(b)})}
